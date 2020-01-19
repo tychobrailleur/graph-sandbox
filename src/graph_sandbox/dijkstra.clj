@@ -1,5 +1,5 @@
 (ns graph-sandbox.dijkstra
-  (:import [java.util PriorityQueue]))
+  (:require [clojure.data.priority-map :refer [priority-map]]))
 
 (def graph {:A [{:B 2} {:C 4}]
             :B [{:D 2} {:F 3}]
@@ -17,11 +17,38 @@
 (defn neighbours [node graph]
   (graph node))
 
+(defn cost [graph from to]
+  (->> (graph from)
+       (some #(when (contains? % to) %))
+       to))
+
+(defn next-cost [cost-so-far current next]
+  (let [c (cost-so-far current)]
+    (sort-by (comp second first)
+             (map #(reduce-kv (fn [map key val] (assoc map key (+ c val))) {} %) next))))
+
+(defn merge-min-map [m other]
+  (merge-with #(if (< %1 %2) %1 %2) m other))
+
 (defn dijkstra-search [graph start end]
-  (let [frontier (PriorityQueue.)
-        visited #{start}
-        came-from {start nil}]
-    (loop [current (.poll frontier)
-           cost-so-far {}
-           next (neighbours current graph)]
-      )))
+  (loop [frontier (priority-map start 0)
+         came-from {start nil}
+         cost-so-far {start 0}]
+    (let [current (first (peek frontier))
+          next (neighbours current graph)
+          costs (reduce merge {} (next-cost cost-so-far current next))]
+      (println frontier)
+      (if (= current end)
+        {:from came-from :cost cost-so-far}
+        (recur (merge-with #(if (< %1 %2) %1 %2) (pop frontier) costs)
+               (reduce #(assoc %1 %2 current) came-from (flatten (map keys next)))
+               (merge-with #(if (< %1 %2) %1 %2) frontier costs))))))
+
+(defn path [graph start end f]
+  (let [res (:from (f graph start end))]
+    (loop [p (res end)
+           t [end]]
+      (if (= p start)
+        (reverse (conj t start))
+        (recur (res p)
+               (conj t p))))))
