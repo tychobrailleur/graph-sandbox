@@ -30,6 +30,15 @@
 (defn merge-min-map [m other]
   (merge-with #(if (< %1 %2) %1 %2) m other))
 
+(defn merge-min-cost-map [came-from from cost new-cost]
+  (if (empty? new-cost)
+    came-from
+    (let [[k v] (first new-cost)]
+      (if (or (not (contains? cost k))
+              (< v (cost k)))
+        (merge-min-cost-map (assoc came-from k from) from cost (dissoc new-cost k))
+        (merge-min-cost-map came-from from cost (dissoc new-cost k))))))
+
 (defn dijkstra-search [graph start end]
   (loop [frontier (priority-map start 0)
          came-from {start nil}
@@ -37,11 +46,12 @@
     (let [current (first (peek frontier))
           next (neighbours current graph)
           costs (reduce merge {} (next-cost cost-so-far current next))]
-      (println frontier)
+      (println came-from cost-so-far)
       (if (= current end)
         {:from came-from :cost cost-so-far}
         (recur (merge-with #(if (< %1 %2) %1 %2) (pop frontier) costs)
-               (reduce #(assoc %1 %2 current) came-from (flatten (map keys next)))
+               (merge-min-cost-map came-from current cost-so-far costs)
+               ;; (reduce #(assoc %1 %2 current) came-from (flatten (map keys next)))
                (merge-with #(if (< %1 %2) %1 %2) frontier costs))))))
 
 (defn path [graph start end f]
