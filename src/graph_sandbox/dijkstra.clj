@@ -29,18 +29,6 @@
 ;;     (sort-by (comp second first)
 ;;              (map #(reduce-kv (fn [map key val] (assoc map key (+ c val))) {} %) next))))
 
-;; (defn merge-min-map [m other]
-;;   (merge-with #(if (< %1 %2) %1 %2) m other))
-
-;; (defn merge-min-cost-map [came-from from cost new-cost]
-;;   (if (empty? new-cost)
-;;     came-from
-;;     (let [[k v] (first new-cost)]
-;;       (if (or (not (contains? cost k))
-;;               (< v (cost k)))
-;;         (merge-min-cost-map (assoc came-from k from) from cost (dissoc new-cost k))
-;;         (merge-min-cost-map came-from from cost (dissoc new-cost k))))))
-
 ;; (defn dijkstra-search [graph start end]
 ;;   (loop [frontier (priority-map start 0)
 ;;          came-from {start nil}
