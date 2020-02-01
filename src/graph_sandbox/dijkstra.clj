@@ -1,7 +1,6 @@
 (ns graph-sandbox.dijkstra
-  (:require [clojure.data.priority-map :refer [priority-map]]))
-
-(def infinity (Double/POSITIVE_INFINITY))
+  (:require [clojure.data.priority-map :refer [priority-map]]
+            [graph-sandbox.common :refer [neighbours cost infinity visited?]]))
 
 (def graph {:A [{:B 2} {:C 4}]
             :B [{:D 2} {:F 3}]
@@ -12,17 +11,6 @@
             :I [{:J 1}]
             :F [{:J 1} {:G 4}]
             :G [{:J 1}]})
-
-;; (defn visited? [node visited]
-;;   (contains? (set visited) node))
-
-(defn neighbours [node graph]
-  (graph node))
-
-(defn cost [graph from to]
-  (->> (graph from)
-       (some #(when (contains? % to) %))
-       to))
 
 ;; (defn next-cost [cost-so-far current next]
 ;;   (let [c (cost-so-far current)]

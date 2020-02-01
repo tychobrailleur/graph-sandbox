@@ -1,5 +1,5 @@
 (ns graph-sandbox.core
-  (:require [graph-sandbox.common :refer [neighbours]]))
+  (:require [graph-sandbox.common :refer [neighbours visited?]]))
 
 ;; Implementation of the different algorithms described here:
 ;; https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -17,10 +17,6 @@
             :E [:D :G]
             :F [:D :G]
             :G [:E :F]})
-
-
-(defn visited? [node visited]
-  (contains? (set visited) node))
 
 (defn next-frontier [graph frontier visited]
   (into #{} (filter (complement #(visited? % visited))

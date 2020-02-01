@@ -1,7 +1,20 @@
 (ns graph-sandbox.common)
 
+(def infinity (Double/POSITIVE_INFINITY))
+
 (defn neighbours [node graph]
   (graph node))
+
+(defn cost [graph from to]
+  (->> (graph from)
+       (some #(when (contains? % to) %))
+       to))
+
+
+(defn visited?
+  "Checks whether node has already been visited."
+  [node visited]
+  (contains? (set visited) node))
 
 (defn path
   "Computes the search algorithm degined by f, and returns the path found."
