@@ -1,4 +1,5 @@
-(ns graph-sandbox.core)
+(ns graph-sandbox.core
+  (:require [graph-sandbox.common :refer [neighbours]]))
 
 ;; Implementation of the different algorithms described here:
 ;; https://www.redblobgames.com/pathfinding/a-star/introduction.html
@@ -20,9 +21,6 @@
 
 (defn visited? [node visited]
   (contains? (set visited) node))
-
-(defn neighbours [node graph]
-  (graph node))
 
 (defn next-frontier [graph frontier visited]
   (into #{} (filter (complement #(visited? % visited))
@@ -69,9 +67,6 @@
 (defn run-breadth-first-find-path []
   (path graph :A :G))
 
-
-
-
-(breadth-first graph :A println)
-
-(breadth-first-paths graph :A println)
+(comment
+  (breadth-first graph :A println)
+  (breadth-first-paths graph :A println))

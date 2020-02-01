@@ -1,5 +1,6 @@
 (ns graph-sandbox.heuristic
-  (:require [clojure.data.priority-map :refer [priority-map]]))
+  (:require [clojure.data.priority-map :refer [priority-map]]
+            [graph-sandbox.common :refer [neighbours]]))
 
 (def graph {:A [{:B 2} {:C 4}]
             :B [{:D 2} {:F 3}]
@@ -11,7 +12,7 @@
             :F [{:J 1} {:G 4}]
             :G [{:J 1}]})
 
-
+;; We use an arbitrary matrix evaluating distance to goal.
 ;;       A B C D E F G H I J
 (def h [[0 1 2 2 3 2 4 3 4 3] ; A
         [1 0 3 1 3 1 3 2 3 2] ; B
@@ -25,6 +26,7 @@
         [3 2 2 2 2 1 1 2 1 0] ; J
         ])
 
+;; Convenience map to convert node to matrix index.
 (def letter->digit {:A 0
                     :B 1
                     :C 2
@@ -36,13 +38,12 @@
                     :I 8
                     :J 9})
 
-(defn neighbours [node graph]
-  (graph node))
-
 (defn heuristic
   "Estimated distance to goal from current node."
   [goal current]
-  (nth (nth h (letter->digit current)) (letter->digit goal)))
+  (-> h
+      (nth (letter->digit current))
+      (nth (letter->digit goal))))
 
 (defn visit-neighbours [u goal neighbours frontier came-from]
   (loop [n neighbours
@@ -64,12 +65,3 @@
       (if (= current end)
         {:from came-from}
         (recur (next :frontier) (next :from))))))
-
-(defn path [graph start end f]
-  (let [res (:from (f graph start end))]
-    (loop [p (res end)
-           t [end]]
-      (if (= p start)
-        (reverse (conj t start))
-        (recur (res p)
-               (conj t p))))))
