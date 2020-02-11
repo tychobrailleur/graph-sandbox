@@ -52,7 +52,7 @@
     (if (empty? n)
       {:frontier f :from c}
       (let [[v _] (first (first n))]
-        (if (not (contains? c v))
+        (if-not (contains? c v)
           (recur (rest n) (assoc f v (heuristic goal v)) (assoc c v u))
           (recur (rest n) f c))))))
 
