@@ -1,6 +1,6 @@
 (ns graph-sandbox.a-star
   (:require [clojure.data.priority-map :refer [priority-map]]
-            [graph-sandbox.common :refer [neighbours cost infinity]]))
+            [graph-sandbox.common :as common :refer [neighbours infinity]]))
 
 (def graph {:A [{:B 2} {:C 4}]
             :B [{:D 2} {:F 3}]
@@ -45,7 +45,7 @@
       (nth (letter->digit current))
       (nth (letter->digit goal))))
 
-(defn visit-neighbours [graph u goal neighbours frontier came-from cost-so-far]
+(defn visit-neighbours [graph current goal neighbours frontier came-from cost-so-far]
   (loop [n neighbours
          f frontier
          c came-from
@@ -53,9 +53,9 @@
     (if (empty? n)
       {:frontier f :from c :costs costs}
       (let [[v _] (first (first n))
-            new-cost (+ (costs u) (cost graph u v))]
-        (if (or (not (contains? c v)) (new-cost (or (costs v) infinity)))
-          (recur (rest n) (assoc f v (+ new-cost (heuristic goal v))) (assoc c v u) (assoc costs v new-cost))
+            new-cost (+ (costs current) (common/get-cost-step graph current v))]
+        (if (or (not (contains? c v)) (< new-cost (or (costs v) infinity)))
+          (recur (rest n) (assoc f v (+ new-cost (heuristic goal v))) (assoc c v current) (assoc costs v new-cost))
           (recur (rest n) f c costs))))))
 
 (defn a-star-search [graph start end]
@@ -65,7 +65,10 @@
     (let [current (first (peek frontier))
           neighbours (neighbours graph current)
           next (visit-neighbours graph current end neighbours (pop frontier) came-from cost-so-far)]
-      (println frontier cost-so-far)
       (if (= current end)
         {:from came-from}
         (recur (next :frontier) (next :costs) (next :from))))))
+
+
+(defn -main [& args]
+  (println (common/path graph :A :J a-star-search)))

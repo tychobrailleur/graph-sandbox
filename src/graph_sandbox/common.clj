@@ -5,7 +5,7 @@
 (defn neighbours [node graph]
   (graph node))
 
-(defn cost [graph from to]
+(defn get-cost-step [graph from to]
   (->> (graph from)
        (some #(when (contains? % to) %))
        to))
@@ -17,7 +17,7 @@
   (contains? (set visited) node))
 
 (defn path
-  "Computes the search algorithm degined by f, and returns the path found."
+  "Computes the search algorithm defined by f, and returns the path found."
   [graph start end f]
   (let [res (:from (f graph start end))]
     (loop [p (res end)

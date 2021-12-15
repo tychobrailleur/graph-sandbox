@@ -1,6 +1,6 @@
 (ns graph-sandbox.dijkstra
   (:require [clojure.data.priority-map :refer [priority-map]]
-            [graph-sandbox.common :refer [neighbours cost infinity visited?]]))
+            [graph-sandbox.common :as common :refer [neighbours infinity visited?]]))
 
 (def graph {:A [{:B 2} {:C 4}]
             :B [{:D 2} {:F 3}]
@@ -41,7 +41,7 @@
     (if (empty? n)
       {:distance dist :previous prev :queue q}
       (let [[v _] (first (first n))
-            alt (+ (dist u) (cost graph u v))]
+            alt (+ (dist u) (common/get-cost-step graph u v))]
         (if (< alt (or (dist v) infinity))
           (recur (rest n) (assoc dist v alt) (assoc prev v u) (assoc q v alt))
           (recur (rest n) dist prev q))))))
@@ -66,3 +66,6 @@
         (reverse (conj t start))
         (recur (res p)
                (conj t p))))))
+
+(comment
+  (path graph :A :G dijkstra-search))
